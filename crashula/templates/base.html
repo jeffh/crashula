@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block page_title %}{% endblock %}Count Crashula{% block post_title %}{% endblock %}</title>
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+<div class="wrapper">
+  <div class="content">
+    <div class="header">
+      <h1>Count Crashula</h1>
+    </div>
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+    <div class="footer">
+      &copy; 2013 Jeff Hui
+    </div>
+  </div>
+</div>
+<!--
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.3.2/mootools-yui-compressed.js"></script>
+<script src="application.js"></script>
+-->
+</body>
+</html>
+

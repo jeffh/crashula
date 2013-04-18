@@ -1,17 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>user_list_crashes.html</title>
-        <link rel="stylesheet" type="text/css" href="style.css" />
-    </head>
-    <body>
-    <p><a href="{% url 'crash_new' %}">New Crash</a></p>
-    <ul>
-      {% for crash_report in crash_reports %}
-      <li>{{ crash_report.title }}</li>
-      {% endfor %}
-    </ul>
-    </body>
-</html>
+{% extends 'base.html' %}
 
+{% block page_title %}My Crashes | {% endblock %}
+
+{% block content %}
+<p><a href="{% url 'crash_new' %}">New Crash</a></p>
+<ul>
+  {% for crash_report in crash_reports %}
+  <li>{{ crash_report.title }}</li>
+  {% endfor %}
+</ul>

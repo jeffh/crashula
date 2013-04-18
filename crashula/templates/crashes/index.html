@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>index.html</title>
-        <link rel="stylesheet" type="text/css" href="style.css" />
-    </head>
-    <body>
-    <a href="{% url 'login' %}">Login</a>
-    </body>
-</html>
+{% extends 'base.html' %}
 
+{% block post_title %} - Track all your software woes{% endblock %}
+
+{% block content %}
+<h1>Some Marketing Page Goes Here</h1>
+{% endblock content %}
