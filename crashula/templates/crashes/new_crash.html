@@ -4,10 +4,7 @@
 
 {% block content %}
 <form action="" method="POST">
-  <p>
-  <input type="text" name="username" placeholder="username" />
-  <input type="password" name="password" placeholder="password" />
-  <input type="submit" name="Login" />
-  </p>
+    {% csrf_token %}
+    {{ form }}
 </form>
 {% endblock content %}

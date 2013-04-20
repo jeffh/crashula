@@ -2,19 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Company(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __unicode__(self):
-        return 'name=%r' % self.name
-
-
 class Application(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    company = models.ForeignKey(Company, null=True, blank=True, related_name='applications')
+    name = models.CharField(max_length=200, unique=True)
+    company = models.CharField(max_length=200, blank=True)
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -25,38 +15,25 @@ class Application(models.Model):
             self.company,
         )
 
+CRASH_KIND_CHOICES = tuple(enumerate((
+    'Annoyance',
+    'Crash',
+    'Hang',
+    'Data Loss',
+)))
 
-class Version(models.Model):
-    application = models.ForeignKey(Application, related_name='versions')
-    marketing = models.CharField(max_length=20)
-    build = models.IntegerField()
-
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ['application', 'build']
-
-    def __unicode__(self):
-        return 'app=%r, marketing=%r, build=%r' % (
-            self.application,
-            self.marketing,
-            self.build,
-        )
-
+CRASH_KIND = dict((n.lower(), i) for (i, n) in CRASH_KIND_CHOICES)
 
 class CrashReport(models.Model):
-    version = models.ForeignKey(Version, related_name='versions')
+    application = models.ForeignKey(Application, related_name='crash_reports')
+    version = models.CharField(max_length=25, blank=True)
+    kind = models.IntegerField(choices=CRASH_KIND_CHOICES, db_index=True, default=0)
     user = models.ForeignKey(User, related_name='crash_reports')
     details = models.TextField(blank=True)
-    title = models.CharField(max_length=200)
-    count = models.IntegerField(default=1)
+    title = models.CharField(max_length=200, db_index=True)
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ['user', 'version', 'title']
 
     def __unicode__(self):
         return 'version=%r, user=%r, title=%r, count=%r' % (
@@ -64,5 +41,22 @@ class CrashReport(models.Model):
             self.user,
             self.title,
             self.count,
+        )
+
+    @property
+    def count(self):
+        return self.crashes.count()
+
+class Crash(models.Model):
+    crash_report = models.ForeignKey(CrashReport, related_name='crashes')
+    user = models.ForeignKey(User, related_name='crashes')
+
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return 'crash_report=%r updated_at=%r' % (
+            self.crash_report,
+            self.updated_at,
         )
 

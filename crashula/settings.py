@@ -1,5 +1,6 @@
 import os
 import sys
+import dj_database_url
 def relative(*paths):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), *paths)
 
@@ -14,15 +15,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'sqlite.db',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
-    }
+    'default': dj_database_url.parse(os.environ.get('CRASHULA', 'sqlite:///' + relative('..', 'sqlite.db'))),
 }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
@@ -87,7 +80,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'v!7j@4#&w)a%7v=&8x5n0mg&x8dk%!!2w7rt_^_n79a^_5e%st'
+SECRET_KEY = os.environ.get('CRASHULA_SECRET_KEY', 'v!7j@4#&w)a%7v=&8x5n0mg&x8dk%!!2w7rt_^_n79a^_5e%st')
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

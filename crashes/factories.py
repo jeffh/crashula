@@ -29,30 +29,24 @@ class AdminFactory(UserFactory):
     username = factory.Sequence(lambda n: 'admin{0}'.format(n))
     is_staff = True
 
-class CompanyFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = Company
-
-    name = factory.Sequence(lambda n: 'Company {0}'.format(n))
-
 class ApplicationFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Application
 
     name = factory.Sequence(lambda n: 'Application {0}'.format(n))
-    company = factory.SubFactory(CompanyFactory)
-
-class VersionFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = Version
-
-    application = factory.SubFactory(ApplicationFactory)
-    marketing = factory.Sequence(lambda n: 'Marketing Version {0}'.format(n))
-    build = factory.Sequence(lambda n: n)
+    company = factory.Sequence(lambda n: 'Company {0}'.format(n))
 
 class CrashReportFactory(factory.DjangoModelFactory):
     FACTORY_FOR = CrashReport
 
-    version = factory.SubFactory(VersionFactory)
+    application = factory.SubFactory(ApplicationFactory)
     user = factory.SubFactory(UserFactory)
+    kind = CRASH_KIND['crash']
+    version = factory.Sequence(lambda n: 'Version {0}'.format(n))
     details = factory.Sequence(lambda n: 'CrashReport Details {0}'.format(n))
     title = factory.Sequence(lambda n: 'CrashReport Title {0}'.format(n))
-    count = 1
+
+class CrashFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Crash
+
+    crash_report = factory.SubFactory(CrashReportFactory)
 

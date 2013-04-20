@@ -8,80 +8,50 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Company'
-        db.create_table(u'crashes_company', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=200)),
-            ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'crashes', ['Company'])
-
         # Adding model 'Application'
         db.create_table(u'crashes_application', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=100)),
-            ('company', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['crashes.Company'])),
+            ('company', self.gf('django.db.models.fields.CharField')(max_length=200, blank=True)),
             ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
         db.send_create_signal(u'crashes', ['Application'])
 
-        # Adding unique constraint on 'Application', fields ['name', 'company']
-        db.create_unique(u'crashes_application', ['name', 'company_id'])
-
-        # Adding model 'Version'
-        db.create_table(u'crashes_version', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('application', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['crashes.Application'])),
-            ('marketing', self.gf('django.db.models.fields.CharField')(max_length=20)),
-            ('build', self.gf('django.db.models.fields.IntegerField')()),
-            ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'crashes', ['Version'])
-
-        # Adding unique constraint on 'Version', fields ['application', 'build']
-        db.create_unique(u'crashes_version', ['application_id', 'build'])
-
         # Adding model 'CrashReport'
         db.create_table(u'crashes_crashreport', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('version', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['crashes.Version'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('application', self.gf('django.db.models.fields.related.ForeignKey')(related_name='crash_reports', to=orm['crashes.Application'])),
+            ('version', self.gf('django.db.models.fields.CharField')(max_length=25, blank=True)),
+            ('kind', self.gf('django.db.models.fields.IntegerField')(db_index=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='crash_reports', to=orm['auth.User'])),
             ('details', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('count', self.gf('django.db.models.fields.IntegerField')(default=1)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=200, db_index=True)),
             ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
         db.send_create_signal(u'crashes', ['CrashReport'])
 
-        # Adding unique constraint on 'CrashReport', fields ['user', 'version']
-        db.create_unique(u'crashes_crashreport', ['user_id', 'version_id'])
+        # Adding model 'Crash'
+        db.create_table(u'crashes_crash', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('crash_report', self.gf('django.db.models.fields.related.ForeignKey')(related_name='crashes', to=orm['crashes.CrashReport'])),
+            ('details', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal(u'crashes', ['Crash'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'CrashReport', fields ['user', 'version']
-        db.delete_unique(u'crashes_crashreport', ['user_id', 'version_id'])
-
-        # Removing unique constraint on 'Version', fields ['application', 'build']
-        db.delete_unique(u'crashes_version', ['application_id', 'build'])
-
-        # Removing unique constraint on 'Application', fields ['name', 'company']
-        db.delete_unique(u'crashes_application', ['name', 'company_id'])
-
-        # Deleting model 'Company'
-        db.delete_table(u'crashes_company')
-
         # Deleting model 'Application'
         db.delete_table(u'crashes_application')
 
-        # Deleting model 'Version'
-        db.delete_table(u'crashes_version')
-
         # Deleting model 'CrashReport'
         db.delete_table(u'crashes_crashreport')
+
+        # Deleting model 'Crash'
+        db.delete_table(u'crashes_crash')
 
 
     models = {
@@ -122,39 +92,32 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'crashes.application': {
-            'Meta': {'unique_together': "(['name', 'company'],)", 'object_name': 'Application'},
-            'company': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['crashes.Company']"}),
+            'Meta': {'object_name': 'Application'},
+            'company': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
-        u'crashes.company': {
-            'Meta': {'object_name': 'Company'},
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200'}),
-            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
-        },
-        u'crashes.crashreport': {
-            'Meta': {'unique_together': "(['user', 'version'],)", 'object_name': 'CrashReport'},
-            'count': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
+        u'crashes.crash': {
+            'Meta': {'object_name': 'Crash'},
+            'crash_report': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'crashes'", 'to': u"orm['crashes.CrashReport']"}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'details': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'version': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['crashes.Version']"})
-        },
-        u'crashes.version': {
-            'Meta': {'unique_together': "(['application', 'build'],)", 'object_name': 'Version'},
-            'application': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['crashes.Application']"}),
-            'build': ('django.db.models.fields.IntegerField', [], {}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'marketing': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        u'crashes.crashreport': {
+            'Meta': {'object_name': 'CrashReport'},
+            'application': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'crash_reports'", 'to': u"orm['crashes.Application']"}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'details': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'kind': ('django.db.models.fields.IntegerField', [], {'db_index': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200', 'db_index': 'True'}),
+            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'crash_reports'", 'to': u"orm['auth.User']"}),
+            'version': ('django.db.models.fields.CharField', [], {'max_length': '25', 'blank': 'True'})
         }
     }
 
