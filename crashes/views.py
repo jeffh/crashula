@@ -20,7 +20,7 @@ def index(request):
     return _render(request, 'crashes/index.html')
 
 @login_required
-def new_crash(request):
+def new_crash(request, username):
     form = CrashForm()
     if request.method == 'POST':
         form = CrashForm(request.POST)
@@ -39,7 +39,7 @@ def new_crash(request):
     return _render(request, 'crashes/new_crash.html', dict(form=form, page='new_crash'))
 
 @login_required
-def edit_crash(request, crash_report_id, **kwargs):
+def edit_crash(request, username, crash_report_id):
     crash_report = get_object_or_404(CrashReport, id=crash_report_id, user=request.user)
     form = CrashForm(instance=crash_report)
     if request.method == 'POST':
