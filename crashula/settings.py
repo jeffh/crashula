@@ -15,7 +15,9 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': dj_database_url.parse(os.environ.get('CRASHULA', 'sqlite:///' + relative('..', 'sqlite.db'))),
+    'default': dj_database_url.parse(
+        os.environ.get('CRASHULA_DATABASE_URL',
+            os.environ.get('DATABASE_URL', 'sqlite:///' + relative('..', 'sqlite.db')))),
 }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
