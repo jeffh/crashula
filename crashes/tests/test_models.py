@@ -2,7 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from crashes.tests.helpers import *
+from crashes import factories as f
 from crashes.models import *
+from crashes.tests.fixtures import *
 
 
 def assert_date_fields(model_class):
@@ -17,6 +19,13 @@ def test_application_fields():
     assert model.company == CharField(max_length=200, blank=True)
     assert_date_fields(Application)
 
+def test_application_unicode(db):
+    app = f.ApplicationFactory.build(name='foo', company='')
+    assert unicode(app) == 'foo'
+
+    app = f.ApplicationFactory.build(name='foo', company='bar')
+    assert unicode(app) == 'foo by bar'
+
 ### CRASH REPORT
 
 def test_crash_report_fields():
@@ -27,13 +36,10 @@ def test_crash_report_fields():
     assert model.user == ForeignKey(User, related_name='crash_reports')
     assert model.details == TextField(blank=True)
     assert model.title == CharField(max_length=200, db_index=True)
+    assert model.count == IntegerField(default=1)
     assert_date_fields(CrashReport)
 
-### CRASH
-
-def test_crash_has_crash_report_field():
-    model = Fields(Crash)
-    assert model.crash_report == ForeignKey(CrashReport, related_name='crashes')
-    assert model.user == ForeignKey(User, related_name='crashes')
-    assert_date_fields(Crash)
+def test_crash_report_unicode(db):
+    cr = f.CrashReportFactory.build(title='Foobar', user__username='Joe', application__name='xcode', kind=CRASH_KIND['crash'])
+    assert unicode(cr) == 'Foobar (xcode crash by Joe)'
 

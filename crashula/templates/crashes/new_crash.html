@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'site_base.html' %}
 
 {% block page_title %}New Crash Report | {% endblock %}
 
@@ -6,5 +6,8 @@
 <form action="" method="POST">
     {% csrf_token %}
     {{ form }}
+    <p>
+    <input class="btn btn-primary" type="submit" value="Save" />
+    </p>
 </form>
 {% endblock content %}

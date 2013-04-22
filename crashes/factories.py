@@ -44,9 +44,5 @@ class CrashReportFactory(factory.DjangoModelFactory):
     version = factory.Sequence(lambda n: 'Version {0}'.format(n))
     details = factory.Sequence(lambda n: 'CrashReport Details {0}'.format(n))
     title = factory.Sequence(lambda n: 'CrashReport Title {0}'.format(n))
-
-class CrashFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = Crash
-
-    crash_report = factory.SubFactory(CrashReportFactory)
+    count = 1
 

@@ -1,12 +1,46 @@
-{% extends 'base.html' %}
+{% extends 'site_base.html' %}
 
 {% block page_title %}My Crashes | {% endblock %}
 
 {% block content %}
-<p><a href="{% url 'crash_new' %}">New Crash</a></p>
-<ul>
-  {% for crash_report in crash_reports %}
-  <li>{{ crash_report.title }}</li>
-  {% endfor %}
-</ul>
+<h1>
+  {{ user.username|title }}'s Crashes
+</h1>
+<p>
+{{ user.username }} tracks all bugs for various software here! Ideally,
+everyone of these would be bug reports, but due to time or location it was easier to
+track it here first.
+</p>
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Application</th>
+            <th>Company</th>
+            <th>Version</th>
+            <th>Occurences</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for crash_report in crash_reports %}
+        <tr>
+            <td><a href="{% url 'edit_crash' request.user.username crash_report.id %}">{{ crash_report.title }}</a></td>
+            <td>{{ crash_report.get_kind_display }}</td>
+            <td>{{ crash_report.application.name }}</td>
+            <td>{{ crash_report.application.company }}</td>
+            <td>{{ crash_report.version }}</td>
+            <td>{{ crash_report.count }}</td>
+            <td class="btn-group">
+                <a href="#" class="btn">+</a>
+                <a href="#" class="btn">-</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'crash_new' request.user.username %}" class="btn">New Crash</a>
 {% endblock content %}
+

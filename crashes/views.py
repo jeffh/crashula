@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-from crashes.models import Crash, CrashReport, Application
+from crashes.models import CrashReport, Application
 from crashes.forms import CrashForm
 
 
@@ -31,18 +31,17 @@ def new_crash(request):
                 title=form.cleaned_data['title'],
                 defaults=form.cleaned_data,
             )
-            crash_report.crashes.create(
-                user=request.user,
-                crash_report=crash_report
-            )
+            if not created:
+                crash_report.count += 1
+                crash_report.save()
 
             return redirect('crash_by_user', request.user.username, crash_report.id)
-    return _render(request, 'crashes/new_crash.html', dict(form=form))
+    return _render(request, 'crashes/new_crash.html', dict(form=form, page='new_crash'))
 
 @login_required
-def edit_crash(request, crash_report_id):
+def edit_crash(request, crash_report_id, **kwargs):
     crash_report = get_object_or_404(CrashReport, id=crash_report_id, user=request.user)
-    form = CrashForm()
+    form = CrashForm(instance=crash_report)
     if request.method == 'POST':
         form = CrashForm(request.POST)
         if form.is_valid():
@@ -50,18 +49,26 @@ def edit_crash(request, crash_report_id):
                 setattr(crash_report, name, value)
             crash_report.save()
             return redirect('crash_by_user', request.user.username, crash_report.id)
-    return _render(request, 'crashes/new_crash.html', dict(form=form, crash_report=crash_report))
+    return _render(request, 'crashes/new_crash.html', dict(
+        form=form,
+        crash_report=crash_report,
+        page='edit_crash',
+    ))
 
-def crash_by_user(request, username, crash_id):
+def crash_by_user(request, username, crash_report_id):
     user = get_object_or_404(User, username=username)
     crash_report = get_object_or_404(CrashReport, user=user)
-    context = dict(crash_report=crash_report)
-    return _render(request, 'crashes/user_crash.html', context)
+    return _render(request, 'crashes/user_crash.html', dict(
+        crash_report=crash_report,
+        page='crash_by_user',
+    ))
 
 
 def crashes_by_user(request, username):
     user = get_object_or_404(User, username=username)
     crash_reports = CrashReport.objects.filter(user=user)
-    context = dict(crash_reports=crash_reports)
-    return _render(request, 'crashes/user_crashes.html', context)
+    return _render(request, 'crashes/user_crashes.html', dict(
+        crash_reports=crash_reports,
+        page='crashes_by_user',
+    ))
 

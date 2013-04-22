@@ -30,3 +30,8 @@ def test_crash_form_has_application_field(db):
     assert isinstance(field, forms.ModelChoiceField)
     assert str(field.queryset.query) == str(Application.objects.all().query)
 
+def test_crash_form_has_count_field():
+    field = form_field(CrashForm, 'count')
+    assert isinstance(field, forms.IntegerField)
+    assert field.min_value == 1
+

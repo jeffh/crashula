@@ -40,7 +40,7 @@ def test_logged_in_user_redirects_to_his_or_her_crashes(rf, user):
     request = rf.get('/')
     request.user = user
     response = v.index(request)
-    assert_redirects_to(response, '/crashes/u/{0}/'.format(user.username))
+    assert_redirects_to(response, '/u/{0}/'.format(user.username))
 
 
 # NEW CRASH PAGE - GET
@@ -78,12 +78,11 @@ def test_logged_in_user_can_create_a_new_crash_with_existing_crash_report(rf, us
     data['application'] = application.id
     request = rf.post('/crashes/new/', data=data)
     request.user = user
-    f.CrashFactory.create(crash_report=crash_report, user=user)
 
     response = v.new_crash(request)
 
     crash_report = models.CrashReport.objects.all()[0]
-    assert_redirects_to(response, '/crashes/u/{0}/{1}/'.format(user.username, crash_report.id))
+    assert_redirects_to(response, '/u/{0}/{1}/'.format(user.username, crash_report.id))
     assert models.CrashReport.objects.count() == 1
     assert crash_report.title == data['title']
     assert crash_report.details == data['details']
@@ -98,7 +97,7 @@ def test_logged_in_user_can_create_a_new_crash_and_crash_report(rf, user, applic
     request.user = user
     response = v.new_crash(request)
     crash_report = models.CrashReport.objects.all()[0]
-    assert_redirects_to(response, '/crashes/u/{0}/{1}/'.format(user.username, crash_report.id))
+    assert_redirects_to(response, '/u/{0}/{1}/'.format(user.username, crash_report.id))
     assert crash_report.title == data['title']
     assert crash_report.details == data['details']
     assert crash_report.application == application
@@ -114,17 +113,17 @@ def test_guest_user_cannot_create_a_new_crash_report(rf, db, guest):
 # CRASH PAGE
 
 def test_crash_by_user_returns_page(rf, user, crash_report):
-    request = rf.get('/crashes/u/{0}/{1}/'.format(user.username, crash_report.id))
+    request = rf.get('/u/{0}/{1}/'.format(user.username, crash_report.id))
     response = v.crash_by_user(request, user.username, crash_report.id)
     assert response.status_code == 200
     assert crash_report.title in response.content
 
 def test_crash_by_invalid_crash_id_is_a_404(rf, user):
-    request = rf.get('/crashes/u/{0}/1/'.format(user.username))
+    request = rf.get('/u/{0}/1/'.format(user.username))
     assert_raises_exception(v.crash_by_user, [request, user.username, 1], Http404)
 
 def test_crash_by_invalid_username_is_a_404(rf, db):
-    request = rf.get('/crashes/u/invalid/1/')
+    request = rf.get('/u/invalid/1/')
     assert_raises_exception(v.crash_by_user, [request, 'invalid', 1], Http404)
 
 
@@ -157,12 +156,12 @@ def test_other_users_cannot_edit_crash_reports(rf, user, other_user, crash_repor
 def test_logged_in_user_can_update_a_crash_report(rf, user, application, crash_report):
     data = f.CrashReportFactory.attributes()
     data['application'] = application.id
-    request = rf.post('/crashes/u/{0}/{1}/edit/'.format(user.username, crash_report.id), data=data)
+    request = rf.post('/u/{0}/{1}/edit/'.format(user.username, crash_report.id), data=data)
     request.user = user
     response = v.edit_crash(request, crash_report.id)
 
     crash_report = models.CrashReport.objects.all()[0]
-    assert_redirects_to(response, '/crashes/u/{0}/{1}/'.format(user.username, crash_report.id))
+    assert_redirects_to(response, '/u/{0}/{1}/'.format(user.username, crash_report.id))
     assert models.CrashReport.objects.count() == 1
     assert crash_report.title == data['title']
     assert crash_report.details == data['details']
@@ -172,19 +171,19 @@ def test_logged_in_user_can_update_a_crash_report(rf, user, application, crash_r
 # LIST CRASHES PAGE
 
 def test_anyone_can_see_crashes_by_user(rf, user, crash_reports):
-    request = rf.get('/crashes/u/{0}/'.format(user.username))
+    request = rf.get('/u/{0}/'.format(user.username))
     response = v.crashes_by_user(request, user.username)
     assert response.status_code == 200
     for crash_report in crash_reports:
         assert crash_report.title in response.content
 
 def test_logged_in_user_has_link_to_add_crashes_on_users_own_page(rf, user):
-    request = rf.get('/crashes/u/{0}/'.format(user.username))
+    request = rf.get('/u/{0}/'.format(user.username))
     request.user = user
     response = v.crashes_by_user(request, user.username)
     assert '/crashes/new/'.format(user.username) in response.content
 
 def test_crashes_by_invalid_username_is_a_404(rf, db):
-    request = rf.get('/crashes/u/invalid/')
+    request = rf.get('/u/invalid/')
     assert_raises_exception(v.crashes_by_user, [request, 'invalid'], Http404)
 

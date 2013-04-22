@@ -1,17 +1,33 @@
-{% extends 'base.html' %}
+{% extends 'site_bare.html' %}
 
 {% block page_title %}Login | {% endblock %}
 
 {% block content %}
-<h1>Login</h1>
-<a href="{% url 'socialauth_begin' 'facebook' %}">Login with Facebook</a>
-<a href="{% url 'socialauth_begin' 'twitter' %}">Login with Twitter</a>
-<form action="{% url 'login' %}" method="POST">
-  <p>
-  <input type="text" name="username" placeholder="Username" />
-  <input type="password" name="password" placeholder="Password" />
-  <input type="submit" name="Login" />
-  </p>
-</form>
+<div class="panel login-form">
+    <h1>Please Login</h1>
+    <hr />
+    <p>
+    <a href="{% url 'socialauth_begin' 'facebook' %}">Login with Facebook</a>
+    </p>
+    <p>
+    <a href="{% url 'socialauth_begin' 'twitter' %}">Login with Twitter</a>
+    </p>
+    <hr />
+    <form action="{% url 'login' %}" method="POST" class="form-horizontal">
+        {% csrf_token %}
+        <p>
+            <input type="text" name="username" placeholder="Username" class="input-block-level" />
+        </p>
+        <p>
+            <input type="password" name="password" placeholder="Password" class="input-block-level" />
+        </p>
+        <p class="form-inline">
+            <label class="checkbox remember-me">
+                <input type="checkbox" name="remember_me" /> Remember Me
+            </label>
+            <input type="submit" class="btn btn-primary btn-login" value="Login" />
+        </p>
+    </form>
+</div>
 {% endblock content %}
 

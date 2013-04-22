@@ -1,11 +1,9 @@
 from django import forms
 
-from crashes.models import Application
+from crashes.models import Application, CrashReport
 
-class CrashForm(forms.Form):
-    application = forms.ModelChoiceField(Application.objects.all())
-    title = forms.CharField(max_length=200)
-    kind = forms.IntegerField()
-    details = forms.CharField(widget=forms.Textarea, required=False)
-    version = forms.CharField(max_length=25)
+class CrashForm(forms.ModelForm):
+    class Meta:
+        model = CrashReport
+        fields = ('application', 'title', 'kind', 'details', 'version', 'count')
 
