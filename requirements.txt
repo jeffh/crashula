@@ -8,3 +8,4 @@ oauth2==1.5.211
 python-openid==2.2.5
 South==0.7.6
 verlib==0.1
+psycopg2
