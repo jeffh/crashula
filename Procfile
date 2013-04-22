@@ -1,1 +1,1 @@
-web: gunicorn crashula/wsgi.py
+web: gunicorn crashula.wsgi:application
