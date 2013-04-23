@@ -4,7 +4,7 @@ import dj_database_url
 def relative(*paths):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), *paths)
 
-DEBUG = True
+DEBUG = os.environ.get('CRASHULA_DEBUG', 'YES').lower() in ('yes', 'y', 'true', '1', 't')
 TEMPLATE_DEBUG = DEBUG
 TESTING = 'test' in ' '.join(sys.argv)
 
