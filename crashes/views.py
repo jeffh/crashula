@@ -57,7 +57,7 @@ def edit_crash(request, username, crash_report_id):
 
 def crash_by_user(request, username, crash_report_id):
     user = get_object_or_404(User, username=username)
-    crash_report = get_object_or_404(CrashReport, user=user)
+    crash_report = get_object_or_404(CrashReport, user=user, id=crash_report_id)
     return _render(request, 'crashes/user_crash.html', dict(
         crash_report=crash_report,
         page='crash_by_user',

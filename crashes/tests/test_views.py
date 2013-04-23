@@ -112,11 +112,11 @@ def test_guest_user_cannot_create_a_new_crash_report(rf, db, guest):
 
 # CRASH PAGE
 
-def test_crash_by_user_returns_page(rf, user, crash_report):
-    request = rf.get('/u/{0}/{1}/'.format(user.username, crash_report.id))
-    response = v.crash_by_user(request, user.username, crash_report.id)
+def test_crash_by_user_returns_page(rf, user, crash_reports):
+    request = rf.get('/u/{0}/{1}/'.format(user.username, crash_reports[0].id))
+    response = v.crash_by_user(request, user.username, crash_reports[0].id)
     assert response.status_code == 200
-    assert crash_report.title in response.content
+    assert crash_reports[0].title in response.content
 
 def test_crash_by_invalid_crash_id_is_a_404(rf, user):
     request = rf.get('/u/{0}/1/'.format(user.username))
