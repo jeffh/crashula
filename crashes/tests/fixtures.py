@@ -1,6 +1,7 @@
 import pytest
 import selenium.webdriver
 
+from django.test.client import Client
 from django.contrib.auth.models import AnonymousUser
 
 from crashes import factories as f
@@ -21,11 +22,6 @@ def browser(webdriver):
     return webdriver
 
 @pytest.fixture()
-def guest():
-    "Returns an anonymous user"
-    return AnonymousUser()
-
-@pytest.fixture()
 def application(db):
     "Returns an application"
     return f.ApplicationFactory.create()
@@ -33,12 +29,18 @@ def application(db):
 @pytest.fixture()
 def user(db):
     "Returns a new authenticated user in the database."
-    return f.UserFactory.create()
+    return f.UserFactory.create(password='password')
+
+@pytest.fixture()
+def user_client(user):
+    client = Client()
+    client.login(username=user.username, password='password')
+    return client
 
 @pytest.fixture()
 def other_user(db):
     "Returns a new authenticated user in the database."
-    return f.UserFactory.create()
+    return f.UserFactory.create(password='password')
 
 @pytest.fixture()
 def admin(db):

@@ -66,7 +66,7 @@ def crash_by_user(request, username, crash_report_id):
 
 def crashes_by_user(request, username):
     user = get_object_or_404(User, username=username)
-    crash_reports = CrashReport.objects.filter(user=user)
+    crash_reports = CrashReport.objects.filter(user=user).order_by('-updated_at')
     return _render(request, 'crashes/user_crashes.html', dict(
         crash_reports=crash_reports,
         page='crashes_by_user',

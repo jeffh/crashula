@@ -18,7 +18,7 @@ CRASH_KIND_CHOICES = tuple(enumerate((
     'Annoyance',
     'Crash',
     'Hang',
-    'Data Loss',
+    'Severe Data Loss',
 )))
 
 CRASH_KIND = dict((n.lower(), i) for (i, n) in CRASH_KIND_CHOICES)
