@@ -5,7 +5,7 @@ factory-boy==2.0.2
 gunicorn==0.17.2
 httplib2==0.8
 oauth2==1.5.211
+psycopg2==2.5
 python-openid==2.2.5
 South==0.7.6
 verlib==0.1
-psycopg2
